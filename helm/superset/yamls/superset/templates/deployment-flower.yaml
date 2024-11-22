@@ -1,0 +1,91 @@
+---
+# Source: superset/templates/deployment-flower.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: release-name-superset-flower
+  namespace: default
+  labels:
+    app: superset-flower
+    chart: superset-0.12.13
+    release: release-name
+    heritage: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: superset-flower
+      release: release-name
+  template:
+    metadata:
+      annotations:
+        checksum/config: 645f8b44e6f772a77ab5910009c2790dc7fa8a372bb685e15183e1b2b88f2ea1
+        checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+      labels:
+        app: "superset-flower"
+        release: release-name
+    spec:
+      securityContext:
+        runAsUser: 0
+      initContainers:
+      - command:
+        - /bin/sh
+        - -c
+        - dockerize -wait "tcp://$DB_HOST:$DB_PORT" -wait "tcp://$REDIS_HOST:$REDIS_PORT"
+          -timeout 120s
+        envFrom:
+        - secretRef:
+            name: 'release-name-superset-env'
+        image: 'apache/superset:dockerize'
+        imagePullPolicy: 'IfNotPresent'
+        name: wait-for-postgres-redis
+      containers:
+        - name: "superset-flower"
+          image: "apachesuperset.docker.scarf.sh/apache/superset:4.0.2"
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh","-c","celery --app=superset.tasks.celery_app:app flower"]
+          env:
+          envFrom:
+            - secretRef:
+                name: "release-name-superset-env"
+          ports:
+            - name: flower
+              containerPort: 5555
+              protocol: TCP
+          volumeMounts:
+            - name: superset-config
+              mountPath: "/app/pythonpath"
+              readOnly: true
+          startupProbe:
+            failureThreshold: 60
+            httpGet:
+              path: /api/workers
+              port: flower
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/workers
+              port: flower
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/workers
+              port: flower
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            {}
+      volumes:
+        - name: superset-config
+          secret:
+            secretName: release-name-superset-config
