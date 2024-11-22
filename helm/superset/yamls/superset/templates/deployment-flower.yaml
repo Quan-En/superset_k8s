@@ -41,7 +41,7 @@ spec:
         name: wait-for-postgres-redis
       containers:
         - name: "superset-flower"
-          image: "apachesuperset.docker.scarf.sh/apache/superset:4.0.2"
+          image: "apache/superset:4.0.2-dev"
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh","-c","celery --app=superset.tasks.celery_app:app flower"]
           env:

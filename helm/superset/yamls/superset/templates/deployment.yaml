@@ -48,7 +48,7 @@ spec:
         name: wait-for-postgres
       containers:
         - name: superset
-          image: "apachesuperset.docker.scarf.sh/apache/superset:4.0.2"
+          image: "apache/superset:4.0.2-dev"
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh","-c",". /app/pythonpath/superset_bootstrap.sh; /usr/bin/run-server.sh"]
           env:

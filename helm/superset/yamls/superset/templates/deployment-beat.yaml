@@ -1,20 +1,21 @@
 ---
-# Source: superset/templates/deployment-worker.yaml
+# Source: superset/templates/deployment-beat.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: release-name-superset-worker
+  name: release-name-superset-celerybeat
   namespace: default
   labels:
-    app: superset-worker
+    app: superset-celerybeat
     chart: superset-0.12.13
     release: release-name
     heritage: Helm
 spec:
+  # This must be a singleton
   replicas: 1
   selector:
     matchLabels:
-      app: superset-worker
+      app: superset-celerybeat
       release: release-name
   template:
     metadata:
@@ -28,7 +29,7 @@ spec:
         checksum/configOverrides: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/configOverridesFiles: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
       labels:
-        app: superset-worker
+        app: "superset-celerybeat"
         release: release-name
     spec:
       securityContext:
@@ -46,10 +47,10 @@ spec:
         imagePullPolicy: 'IfNotPresent'
         name: wait-for-postgres-redis
       containers:
-        - name: superset
+        - name: "superset-celerybeat"
           image: "apache/superset:4.0.2-dev"
           imagePullPolicy: IfNotPresent
-          command: ["/bin/sh","-c",". /app/pythonpath/superset_bootstrap.sh; celery --app=superset.tasks.celery_app:app worker"]
+          command: ["/bin/sh","-c",". /app/pythonpath/superset_bootstrap.sh; celery --app=superset.tasks.celery_app:app beat --pidfile /tmp/celerybeat.pid --schedule /tmp/celerybeat-schedule"]
           env:
             - name: "SUPERSET_PORT"
               value: "8088"
@@ -60,17 +61,6 @@ spec:
             - name: superset-config
               mountPath: "/app/pythonpath"
               readOnly: true
-          livenessProbe:
-            exec:
-              command:
-              - sh
-              - -c
-              - celery -A superset.tasks.celery_app:app inspect ping -d celery@$HOSTNAME
-            failureThreshold: 3
-            initialDelaySeconds: 120
-            periodSeconds: 60
-            successThreshold: 1
-            timeoutSeconds: 60
           resources:
             {}
       volumes:
