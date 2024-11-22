@@ -19,7 +19,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 645f8b44e6f772a77ab5910009c2790dc7fa8a372bb685e15183e1b2b88f2ea1
+        checksum/config: 395c97233958b4c61197a49670ef41b5646d95f58ee8f5226c7040b65cd2a06b
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
       labels:
         app: "superset-flower"
