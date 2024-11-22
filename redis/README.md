@@ -1,0 +1,1 @@
+follow this tutorial: https://shubhamksawant.medium.com/deploy-redis-deployment-on-kubernetes-c8c04275e7ec
