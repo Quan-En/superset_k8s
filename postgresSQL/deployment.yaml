@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: 'postgres:14'
-          imagePullPolicy: IfNotPresent
+          image: postgres:15
+          imagePullPolicy: Never
           ports:
             - containerPort: 5432
           envFrom:
