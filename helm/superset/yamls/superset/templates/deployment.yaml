@@ -20,14 +20,14 @@ spec:
     metadata:
       annotations:
         # Force reload on config changes
-        checksum/superset_config.py: a64e21928e2643bf58bae40e670acc7d37402ab02d363cc0297cef7c53837d71
+        checksum/superset_config.py: 53d743de31670c783ea9960b0a8d0e33f32132124c7e81beab78d21a2b11bd87
         checksum/superset_init.sh: e6b1e8eac1f7a79a07a6c72a0e2ee6e09654eeb439c6bbe61bfd676917c41e02
         checksum/superset_bootstrap.sh: dc9a47141051ced34960c313860a55e03eb48c1fa36a0ed25c03ad60cd3b5c48
         checksum/connections: 58193508001432ce7fd8f3da42462f46ff186fc66e04b6e0010757e3e892c111
         checksum/extraConfigs: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/extraSecrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/extraSecretEnv: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
-        checksum/configOverrides: 7b45f200049213b9eb812dc49b6f071baebc6b12bfc563b31d403d0c654ae581
+        checksum/configOverrides: 90ba04c8ebd71668617d33c6cdc549fd6e18bc5a58f0ca07f5e22e01c90c30c8
         checksum/configOverridesFiles: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
       labels:
         app: superset
