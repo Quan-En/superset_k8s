@@ -139,6 +139,15 @@ extraVolumeMounts: []
 # WARNING: the order is not guaranteed
 # Files can be passed as helm --set-file configOverrides.my-override=my-file.py
 configOverrides: 
+  metadata_db_connect: |
+    import os
+    DB_DIALECT = os.getenv("DB_DIALECT")
+    DB_HOST = os.getenv("DB_HOST")
+    DB_PORT = os.getenv("DB_PORT")
+    DB_NAME = os.getenv("DB_NAME")
+    DB_USER = os.getenv("DB_USER")
+    DB_PASS = os.getenv("DB_PASS")
+    SQLALCHEMY_DATABASE_URI = f"{DB_DIALECT}://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
   rate_limit: |
     import os
     REDIS_HOST = os.getenv("REDIS_HOST")
@@ -326,8 +335,9 @@ supersetNode:
       enabled: false
       ssl_cert_reqs: CERT_NONE
     # You need to change below configuration incase bringing own PostgresSQL instance and also set postgresql.enabled:false
-    db_host: 'postgresql'
-    db_port: "5432"
+    db_dialect: 'mysql' # 'postgresql+psycopg2'
+    db_host: 'mariadb' # 'postgresql'
+    db_port: '3306' # "5432"
     db_user: superset
     db_pass: superset
     db_name: superset
