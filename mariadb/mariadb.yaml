@@ -2,40 +2,39 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: postgres-secret
+  name: mariadb-secret
   labels:
-    app: postgres
+    app: mariadb
 data:
-  POSTGRES_DB: superset
-  POSTGRES_USER: superset
-  POSTGRES_PASSWORD: superset
+  MARIADB_DATABASE: superset
+  MARIADB_USER: superset
+  MARIADB_PASSWORD: superset
+  MARIADB_ROOT_PASSWORD: superset
 
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: postgres-volume
+  name: mariadb-volume
   labels:
     type: local
-    app: postgres
+    app: mariadb
 spec:
-  # storageClassName: manual
   capacity:
     storage: 5Gi
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: /data/postgresql
+    path: /data/mariadb
 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: postgres-volume-claim
+  name: mariadb-volume-claim
   labels:
-    app: postgres
+    app: mariadb
 spec:
-  # storageClassName: manual
   accessModes:
     - ReadWriteMany
   resources:
@@ -46,26 +45,26 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres
+  name: mariadb
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postgres
+      app: mariadb
   template:
     metadata:
       labels:
-        app: postgres
+        app: mariadb
     spec:
       containers:
-        - name: postgres
-          image: postgres:15
+        - name: mariadb
+          image: mariadb:10.11
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 5432
+            - containerPort: 3306
           envFrom:
             - configMapRef:
-                name: postgres-secret
+                name: mariadb-secret
           resources:
             limits:
               memory: "512Mi"
@@ -74,23 +73,23 @@ spec:
               memory: "256Mi"
               cpu: "250m"
           volumeMounts:
-            - mountPath: /var/lib/postgresql/data
-              name: postgresdata
+            - mountPath: /var/lib/mysql
+              name: mariadbdata
       volumes:
-        - name: postgresdata
+        - name: mariadbdata
           persistentVolumeClaim:
-            claimName: postgres-volume-claim
+            claimName: mariadb-volume-claim
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgresql
+  name: mariadb
 spec:
   selector:
-    app: postgres  # 需匹配 Deployment 的 labels
+    app: mariadb  # Must match Deployment's labels
   ports:
     - protocol: TCP
-      port: 5432         # 服务的端口
-      targetPort: 5432   # Pod 中的容器端口
-  type: ClusterIP        # 默认类型，适用于集群内部通信
+      port: 3306         # Service port
+      targetPort: 3306   # Pod's container port
+  type: ClusterIP        # Default type, for internal cluster communication
